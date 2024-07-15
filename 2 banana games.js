@@ -4,7 +4,7 @@ https://sprig.hackclub.com/gallery/getting_started
 
 @title: the two bananas game
 @author: sridhar
-@tags: [#bananasarecool]
+@tags: ['#bananasarecool']
 @addedOn: 2024-00-00
 */
 
@@ -14,6 +14,9 @@ const soccerBall = "s"
 const leftGoal = "l"
 const rightGoal = "r"
 const sumoBounds = "b"
+const bBallBasketLeft = "a"
+const bBallBasketRight = "c"
+const bBall = "d"
 
 // for computer people; one and two stands for player one and player two
 let upKeyOne = "w"
@@ -133,11 +136,62 @@ setLegend(
 .0.0.0....0.0.0.
 0.0.0.0..0.0.0.0
 .0.0.0....0.0.0.
-0.0.0.0..0.0.0.0`] // sumo game
+0.0.0.0..0.0.0.0`], // sumo game
+  [ bBallBasketLeft, bitmap`
+................
+................
+................
+................
+0000000000000000
+..0.0.0..0.0.0..
+..000000000000..
+..0.0.0..0.0.0..
+...0000000000...
+....0.0..0.0....
+....00000000....
+....0.0..0.0....
+.....00..00.....
+......0000......
+................
+................`],
+  [ bBallBasketRight, bitmap`
+................
+................
+................
+................
+0000000000000000
+..0.0.0..0.0.0..
+..000000000000..
+..0.0.0..0.0.0..
+...0000000000...
+....0.0..0.0....
+....00000000....
+....0.0..0.0....
+.....00..00.....
+......0000......
+................
+................`],
+  [ bBall, bitmap`
+...0000000000...
+..099999099990..
+.00999990990990.
+0990999900990990
+0999099990099990
+0999909999009990
+0999990999900990
+0000999099990000
+0990099909999990
+0999009990999990
+0999900999099990
+0990990099909990
+0999099099990990
+.09999909999900.
+..099990999990..
+...0000000000...`]
 )
 
 setSolids(
-  [player1, player2, soccerBall]
+  [player1, player2, soccerBall, bBall]
 )
 
 // game level score
@@ -166,16 +220,33 @@ b.p...t.b
 b.......b
 b.......b
 b.......b
-bbbbbbbbb` // sumo
+bbbbbbbbb`, // sumo
+  map`
+...............
+...............
+...............
+..c..p.d.t..c..
+...............
+...............
+...............` //basketball
 ]
 
 // core functionality
 setMap(levels[level])
 
+// sets title of the game
+function resetGameTitle() {
+  if (level == 1) {addText("Soccer Game", {y:1, color: color`2`})}
+  else if (level == 2) {addText("Sumo Game", {y:1, color: color`0`})}
+  else if (level == 3) {addText("Basketball Game", {y:1, color: color`2`})}
+}
+resetGameTitle();
+
 setPushables({
-  [ player1 ]: [ player2, soccerBall ],
-  [ player2 ]: [ player1, soccerBall ],
-  [ soccerBall ]: [player1, player2]
+  [ player1 ]: [ player2, soccerBall, bBall],
+  [ player2 ]: [ player1, soccerBall, bBall ],
+  [ soccerBall ]: [ player1, player2 ],
+  [ bBall ]: [ player1, player2 ]
 })
 
 onInput(upKeyOne, () => {
@@ -255,6 +326,19 @@ afterInput(() => {
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
+  // basketball game functionality
+    const ballInLeftBasket = tilesWith(bBallBasketLeft, bBall).length;
+    const ballInRightBasket = tilesWith(bBallBasketRight, bBall).length;
+    if (ballInLeftBasket == 1 && !theEnd && !transitioning) {
+      addText("player two wins!", { y: 4, color: color`3` });
+      transitioning = true;
+      setTimeout(advanceLevel, 3000);
+    }
+    else if (ballInRightBasket == 1 && !theEnd && !transitioning) {
+      addText("player one wins!", { y: 4, color: color`5` });
+      transitioning = true;
+      setTimeout(advanceLevel, 3000);
+    }
 })
 
 // this function makes the game advance to the next level
@@ -265,6 +349,7 @@ function advanceLevel() {
   if (nextLevel !== undefined) {
     clearText();
     setMap(nextLevel);
+    resetGameTitle();
   } else {
     clearText();
     theEnd = true;

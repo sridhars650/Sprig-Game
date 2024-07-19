@@ -868,6 +868,10 @@ let inGame = false; // DEV TESTING SET TO FALSE WHEN DONE
 // help menu stuffs
 let backButtonColor = 9;
 
+// scoring system
+let player1Score = 0;
+let player2Score = 0;
+
 // all sprite images are contained in 128x 128 pixels
 setLegend(
   [ player1, bitmap`
@@ -1366,9 +1370,9 @@ function addHelpMenuText() {
 }
 
 // initial for menu
+
 setMenu() // DEV TESTING UNCOMMENT WHEN DONE
 
-//PCKeys() // DEV TESTING COMMENT WHEN DONE
 // function for movement input for pc players
 function PCKeys()
 {
@@ -1466,11 +1470,13 @@ afterInput(() => {
     // if player two scored then and its not the end
     if (ballInLeftGoal == 1 && !theEnd && !transitioning) {
       addText("player two wins!", { y: 4, color: color`3` });
+      player2Score++;
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
     else if (ballInRightGoal == 1 && !theEnd && !transitioning) {
       addText("player one wins!", { y: 4, color: color`5` });
+      player1Score++;
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
@@ -1481,11 +1487,13 @@ afterInput(() => {
     const playerTwoOut = tilesWith(sumoBounds, player2).length;
     if (playerOneOut == 1 && !theEnd && !transitioning) {
       addText("player two wins!", { y: 4, color: color`3` });
+      player2Score++;
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
     else if (playerTwoOut == 1 && !theEnd && !transitioning) {
       addText("player one wins!", { y: 4, color: color`5` });
+      player1Score++;
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
@@ -1519,11 +1527,13 @@ afterInput(() => {
     // goal functionality
     if (ballInLeftBasket == 1 && !theEnd && !transitioning && isAtTop) {
       addText("player two wins!", { y: 4, color: color`3` });
+      player2Score++;
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
     else if (ballInRightBasket == 1 && !theEnd && !transitioning && isAtTop) {
       addText("player one wins!", { y: 4, color: color`5` });
+      player1Score++;
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
@@ -1534,11 +1544,13 @@ afterInput(() => {
     const playerTwoInFinishLine = tilesWith(finishLine, player2).length;
     if (playerOneInFinishLine == 1 && !theEnd && !transitioning) {
       addText("player one wins!", { y: 13, color: color`5` });
+      player1Score++;
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
     else if (playerTwoInFinishLine == 1 && !theEnd && !transitioning) {
       addText("player two wins!", { y: 13, color: color`3` });
+      player2Score++;
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
@@ -1554,16 +1566,27 @@ afterInput(() => {
     }
     const playerOneInHotZone = tilesWith(lava, player1).length;
     const playerTwoInHotZone = tilesWith(lava, player2).length;
-    if (playerOneInHotZone == 1 && !theEnd && !transitioning) {
+    const playerOneTwoInHotZone = tilesWith(lava, player1,player2).length;
+    if (playerOneTwoInHotZone == 1 && !theEnd && !transitioning) {
+      addText("tie!", { y: 14, color: color`4` });
+      player1Score++;
+      player2Score++;
+      transitioning = true;
+      setTimeout(advanceLevel, 3000);
+    }
+    else if (playerOneInHotZone == 1 && !theEnd && !transitioning) {
       addText("player two wins!", { y: 14, color: color`3` });
+      player2Score++;
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
     else if (playerTwoInHotZone == 1 && !theEnd && !transitioning) {
       addText("player one wins!", { y: 14, color: color`5` });
+      player1Score++;
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
+    
   }
 })
 
@@ -1580,6 +1603,21 @@ function advanceLevel() {
     clearText();
     theEnd = true;
     addText("the end!", { y: 1, color: color`H` });
+    if (player1Score > player2Score)
+    {
+      addText("winner: blue banana!", {  y: 14, color: color`5` })
+      addText("final score: " + player1Score + "-" + player2Score, {  y: 15, color: color`4` })
+    }
+    else if (player2Score > player1Score)
+    {
+      addText("winner: red banana!", {  y: 14, color: color`3` })
+      addText("final score: " + player1Score + "-" + player2Score, {  y: 15, color: color`4` })
+    }
+    else 
+    {
+      addText("its a draw! " + player1Score + "-" + player2Score, { y: 14, color: color`4` })
+      addText("final score: " + player1Score + "-" + player2Score, {  y: 15, color: color`4` })
+    }
   }
   transitioning = false;
 }

@@ -40,10 +40,12 @@ let count = 0;
 let transitioning = false;
 
 // menu stuffs
-let menuPCColor = 0;
+let menuPCColor = 9;
 let menuConsoleColor = 0;
-let menuHelpColor = 9;
+let menuHelpColor = 0;
 let menuSelection = "Play on PC"
+let inMenu = true;
+let inGame = false;
 
 setLegend(
   [ player1, bitmap`
@@ -347,7 +349,7 @@ function setMenu() {
     y:5,
     color: color`${menuHelpColor}`
   })
-  addText("Left Controls:", {
+  addText("Left Controls/WASD:", {
     x:1,
     y:10,
     color: color`0`
@@ -357,7 +359,7 @@ function setMenu() {
     y:11,
     color: color`0`
   })
-  addText("Right Down Key:", {
+  addText("Right Down Key/K:", {
     x:1,
     y:13,
     color: color`0`
@@ -368,62 +370,92 @@ function setMenu() {
     color: color`0`
   })
 }
-setMenu()
+
 
 // THIS IS ONLY FOR MENU
 if (level == 0) {
+  isMenu = true;
   onInput(upKeyOne, () => {
-    if (menuPCColor != 9) {
+    if (menuPCColor != 9 && inMenu) {
       if (menuHelpColor == 9) {
         menuHelpColor = 0
         menuConsoleColor = 9;
-        menuSelection = "Help"
+        menuSelection = "Play on Console"
         setMenu()
       }
-      else if (menuConsoleColor == 9) {
+      else if (menuConsoleColor == 9 ) {
         menuConsoleColor = 0;
         menuPCColor = 9;
-        menuSelection = "Play on Console"
+        menuSelection = "Play on PC"
         setMenu()
       }
     }
   })
+  onInput(downKeyOne, () => {
+    if (menuHelpColor != 9 && inMenu) {
+      if (menuPCColor == 9) {
+        menuPCColor = 0
+        menuConsoleColor = 9
+        menuSelection = "Play on Console"
+        console.log("console picked")
+        setMenu()
+      }
+      else if (menuConsoleColor == 9) {
+        menuConsoleColor = 0;
+        menuHelpColor = 9;
+        menuSelection = "Help"
+        setMenu()
+      }
+    }
+  })
+  onInput(downKeyTwo, () => {
+    if (inMenu)
+    {
+      if (menuSelection === "Play on PC") {setTimeout(advanceLevel, 0)}
+      else if (menuSelection === "Play on Console") {rebindKeysForConsole(); setTimeout(advanceLevel, 0)}
+      else if (menuSelection === "Help") {}
+    }
+  })
 }
 
-// if statement ensures for menu only
-if (level > 0) {
-  onInput(upKeyOne, () => {
-    if (!transitioning) getFirst(player1).y -= 1
-  })
-  
-  onInput(leftKeyOne, () => {
-    if (!transitioning) getFirst(player1).x -= 1
-  })
-  
-  onInput(downKeyOne, () => {
-    if (!transitioning) getFirst(player1).y += 1
-  })
-  
-  onInput(rightKeyOne, () => {
-    if (!transitioning) getFirst(player1).x += 1
-  })
-  
-  onInput(upKeyTwo, () => {
-    if (!transitioning) getFirst(player2).y -= 1
-  })
-  
-  onInput(leftKeyTwo, () => {
-    if (!transitioning) getFirst(player2).x -= 1
-  })
-  
-  onInput(downKeyTwo, () => {
-    if (!transitioning) getFirst(player2).y += 1
-  })
-  
-  onInput(rightKeyTwo, () => {
-    if (!transitioning) getFirst(player2).x += 1
-  })
-}
+setMenu()
+
+
+// while statement ensures for menu only
+onInput(upKeyOne, () => {
+  if (!transitioning && inGame) getFirst(player1).y -= 1;
+});
+
+onInput(leftKeyOne, () => {
+  if (!transitioning && inGame) getFirst(player1).x -= 1;
+});
+
+onInput(downKeyOne, () => {
+  if (!transitioning && inGame) getFirst(player1).y += 1;
+});
+
+onInput(rightKeyOne, () => {
+  if (!transitioning && inGame) getFirst(player1).x += 1;
+});
+
+onInput(upKeyTwo, () => {
+  if (!transitioning && inGame) getFirst(player2).y -= 1;
+});
+
+onInput(leftKeyTwo, () => {
+  if (!transitioning && inGame) getFirst(player2).x -= 1;
+});
+
+onInput(downKeyTwo, () => {
+  if (!transitioning && inGame) getFirst(player2).y += 1;
+});
+
+onInput(rightKeyTwo, () => {
+  if (!transitioning && inGame) getFirst(player2).x += 1;
+});
+
+
+
 // rebinds the wasd keys for console to make 2 player easier
 function rebindKeysForConsole() {
   // player one controls on console
@@ -536,6 +568,8 @@ function advanceLevel() {
     clearText();
     setMap(nextLevel);
     resetGameTitle();
+    inMenu = false;
+    inGame = true;
   } else {
     clearText();
     theEnd = true;

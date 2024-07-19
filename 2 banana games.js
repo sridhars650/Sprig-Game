@@ -32,6 +32,10 @@ let rightKeyTwo = "l"
 
 //bool val where it checks if its the end
 let theEnd = false;
+// basketball game - to check if ball is at top
+let isAtTop = false;
+// temp var for bball game
+let count = 0;
 // to freeze char if its transitioning from one lvl to another
 let transitioning = false;
 
@@ -247,14 +251,14 @@ setSolids(
 )
 
 // game level score
-let level = 4
+let level = 1
 const levels = [
   map`
 ........
 ........
 ........
 ........
-........`, // menu (still need building)
+........`, // menu (still need building) ; 0
   map`
 l...........r
 l...........r
@@ -262,7 +266,7 @@ l...........r
 l...p.s.t...r
 l...........r
 l...........r
-l...........r`, // soccer game
+l...........r`, // soccer game;1
   map`
 bbbbbbbbb
 b.......b
@@ -272,15 +276,15 @@ b.p...t.b
 b.......b
 b.......b
 b.......b
-bbbbbbbbb`, // sumo
+bbbbbbbbb`, // sumo;2
   map`
 ...............
 ...............
 ...............
-..c..p.d.t..c..
+..a..p.d.t..c..
 ...............
 ...............
-...............`, //basketball
+...............`, // basketball;3
   map`
 qqqq.q.q..q..q..q..q..f
 p....q.q...o.q..o..q..f
@@ -291,7 +295,7 @@ qq...q.q.o...q...q.q.qf
 .q......q..q....o.qqqqf
 qq....q.o...o.o.q.q...f
 t.....q.o.....q.qqq.o.f
-qqqq..q.q..q.q......o.f` // the race
+qqqq..q.q..q.q......o.f` // the race;4
 ]
 
 // core functionality
@@ -362,6 +366,7 @@ function rebindKeysForConsole() {
 afterInput(() => {
 
   // soccer game functionality
+  if (level == 1) {
     // checks for if goal tiles and the ball tile is in one tile
     const ballInLeftGoal = tilesWith(leftGoal, soccerBall).length;
     const ballInRightGoal = tilesWith(rightGoal, soccerBall).length;
@@ -376,10 +381,11 @@ afterInput(() => {
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
+  }
   // sumo game functionality
+  if (level == 2) {
     const playerOneOut = tilesWith(sumoBounds, player1).length;
     const playerTwoOut = tilesWith(sumoBounds, player2).length;
-    console.log(playerOneOut, playerTwoOut, ballInLeftGoal, ballInRightGoal)
     if (playerOneOut == 1 && !theEnd && !transitioning) {
       addText("player two wins!", { y: 4, color: color`3` });
       transitioning = true;
@@ -390,20 +396,47 @@ afterInput(() => {
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
+  }
   // basketball game functionality
+  if (level == 3) { 
     const ballInLeftBasket = tilesWith(bBallBasketLeft, bBall).length;
     const ballInRightBasket = tilesWith(bBallBasketRight, bBall).length;
-    if (ballInLeftBasket == 1 && !theEnd && !transitioning) {
+    // checks if ball is on top of basket
+    if (((getFirst(bBall).x == 12) && getFirst(bBall).y == 2))
+    {
+      isAtTop = true;
+      setSolids([player1, player2, soccerBall, bBall, obstacle, obstacle2])
+      count = 0
+    }
+    else if (((getFirst(bBall).x == 2) && getFirst(bBall).y == 2))
+    {
+      isAtTop = true;
+      setSolids([player1, player2, soccerBall, bBall, obstacle, obstacle2])
+      count = 0
+    }
+      // else it counts; this counter is to prevent it from not working when in goal
+    else {count++}
+    // checks how long it can be set to "on top of basket goal" 
+    if (count == 2)
+    {
+        isAtTop = false;
+        setSolids([player1, player2, soccerBall, bBall, obstacle, obstacle2, bBallBasketLeft, bBallBasketRight])
+        count = 0;
+    }
+    // goal functionality
+    if (ballInLeftBasket == 1 && !theEnd && !transitioning && isAtTop) {
       addText("player two wins!", { y: 4, color: color`3` });
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
-    else if (ballInRightBasket == 1 && !theEnd && !transitioning) {
+    else if (ballInRightBasket == 1 && !theEnd && !transitioning && isAtTop) {
       addText("player one wins!", { y: 4, color: color`5` });
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
+  }
   // the race game functionality
+  if (level == 4) {
     const playerOneInFinishLine = tilesWith(finishLine, player1).length;
     const playerTwoInFinishLine = tilesWith(finishLine, player2).length;
     if (playerOneInFinishLine == 1 && !theEnd && !transitioning) {
@@ -416,6 +449,7 @@ afterInput(() => {
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
+  }
 })
 
 // this function makes the game advance to the next level

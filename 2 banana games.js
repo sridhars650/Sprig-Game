@@ -18,6 +18,77 @@ const bBall = "d"
 const finishLine = "f"
 const obstacle = "o"
 const obstacle2 = "q"
+let tracks = [
+tune`
+0,
+166.66649999999998: B3^166.66649999999998,
+166.66649999999998: A3^166.66649999999998,
+166.66649999999998: G3^166.66649999999998,
+166.66649999999998: A3^166.66649999999998,
+166.66650000000004: G3^166.66650000000004,
+333.33299999999986: F3^166.66649999999993,
+166.66650000000004: D3^166.66650000000004,
+166.66650000000004: D3^166.66650000000004,
+166.66650000000004: E3^166.66650000000004,
+166.66649999999981: G4^166.66649999999981,
+166.66650000000004: F4^166.66650000000004,
+166.66650000000004: G4^166.66650000000004,
+166.66649999999981: F4^166.66649999999981,
+166.66650000000027: A4^166.66650000000027,
+166.66649999999981: A4^166.66649999999981,
+166.66649999999981: F3^166.66649999999981,
+166.66650000000027: G3^166.66650000000027,
+166.66649999999981: G3^166.66649999999981,
+166.66650000000027: B3^166.66650000000027,
+166.66649999999981: A3^166.66649999999981,
+166.66649999999981: G3^166.66649999999981,
+166.66650000000027: F3^166.66650000000027,
+166.66649999999981: F3^166.66649999999981,
+166.66650000000027: F4^166.66650000000027,
+166.66649999999981: E4^166.66649999999981,
+166.66649999999981: F4^166.66649999999981,
+166.66649999999981: E4^166.66649999999981,
+166.66649999999981: G4^166.66649999999981,
+166.66650000000072: G4^166.66650000000072,
+166.66649999999981: G3^166.66649999999981,
+5166.6615: A3^166.66649999999981,
+`,
+tune`
+0,
+166.66649999999998: B1^166.66649999999998,
+166.66649999999998: B1^166.66649999999998,
+166.66649999999998: D#2^166.66649999999998,
+166.66649999999998: D#2^166.66649999999998,
+166.66650000000004: B1^166.66650000000004,
+166.66649999999993: B1^166.66649999999993,
+166.66649999999993: D#2^166.66649999999993,
+166.66650000000004: D#2^166.66650000000004,
+166.66650000000004: B1^166.66650000000004,
+166.66650000000004: B1^166.66650000000004,
+166.66649999999981: D#2^166.66649999999981,
+166.66650000000004: D#2^166.66650000000004,
+166.66650000000004: B1^166.66650000000004,
+166.66649999999981: B1^166.66649999999981,
+166.66650000000027: D#2^166.66650000000027,
+166.66649999999981: D#2^166.66649999999981,
+166.66649999999981: B1^166.66649999999981,
+166.66650000000027: B1^166.66650000000027,
+166.66649999999981: D#2^166.66649999999981,
+166.66650000000027: D#2^166.66650000000027,
+166.66649999999981: B1^166.66649999999981,
+166.66649999999981: B1^166.66649999999981,
+166.66650000000027: D#2^166.66650000000027,
+166.66649999999981: D#2^166.66649999999981,
+166.66650000000027: B1^166.66650000000027,
+166.66649999999981: B1^166.66649999999981,
+166.66649999999981: D#2^166.66649999999981,
+166.66649999999981: D#2^166.66649999999981,
+166.66649999999981: B1^166.66649999999981,
+166.66650000000072: B1^166.66650000000072,
+166.66649999999981: D#2^166.66649999999981,
+5166.6615: D#2^166.66649999999981,
+`,
+];
 
 // for computer people; one and two stands for player one and player two
 let upKeyOne = "w"
@@ -258,6 +329,10 @@ setSolids(
   [player1, player2, soccerBall, bBall, obstacle, obstacle2]
 )
 
+//plays the musics
+const playback = tracks.forEach((e) => playTune(e, Infinity));
+
+
 // game level score
 let level = 0
 const levels = [
@@ -411,8 +486,8 @@ if (level == 0) {
   onInput(downKeyTwo, () => {
     if (inMenu)
     {
-      if (menuSelection === "Play on PC") {setTimeout(advanceLevel, 0)}
-      else if (menuSelection === "Play on Console") {rebindKeysForConsole(); setTimeout(advanceLevel, 0)}
+      if (menuSelection === "Play on PC") {PCKeys(); setTimeout(advanceLevel, 0)}
+      else if (menuSelection === "Play on Console") {rebindKeysForConsole(); ConsoleKeys(); setTimeout(advanceLevel, 0)}
       else if (menuSelection === "Help") {}
     }
   })
@@ -422,38 +497,75 @@ setMenu()
 
 
 // while statement ensures for menu only
-onInput(upKeyOne, () => {
-  if (!transitioning && inGame) getFirst(player1).y -= 1;
-});
+function PCKeys()
+{
+  onInput(upKeyOne, () => {
+    if (!transitioning && inGame) getFirst(player1).y -= 1;
+  });
+  
+  onInput(leftKeyOne, () => {
+    if (!transitioning && inGame) getFirst(player1).x -= 1;
+  });
+  
+  onInput(downKeyOne, () => {
+    if (!transitioning && inGame) getFirst(player1).y += 1;
+  });
+  
+  onInput(rightKeyOne, () => {
+    if (!transitioning && inGame) getFirst(player1).x += 1;
+  });
+  
+  onInput(upKeyTwo, () => {
+    if (!transitioning && inGame) getFirst(player2).y -= 1;
+  });
+  
+  onInput(leftKeyTwo, () => {
+    if (!transitioning && inGame) getFirst(player2).x -= 1;
+  });
+  
+  onInput(downKeyTwo, () => {
+    if (!transitioning && inGame) getFirst(player2).y += 1;
+  });
+  
+  onInput(rightKeyTwo, () => {
+    if (!transitioning && inGame) getFirst(player2).x += 1;
+  });
+}
 
-onInput(leftKeyOne, () => {
-  if (!transitioning && inGame) getFirst(player1).x -= 1;
-});
-
-onInput(downKeyOne, () => {
-  if (!transitioning && inGame) getFirst(player1).y += 1;
-});
-
-onInput(rightKeyOne, () => {
-  if (!transitioning && inGame) getFirst(player1).x += 1;
-});
-
-onInput(upKeyTwo, () => {
-  if (!transitioning && inGame) getFirst(player2).y -= 1;
-});
-
-onInput(leftKeyTwo, () => {
-  if (!transitioning && inGame) getFirst(player2).x -= 1;
-});
-
-onInput(downKeyTwo, () => {
-  if (!transitioning && inGame) getFirst(player2).y += 1;
-});
-
-onInput(rightKeyTwo, () => {
-  if (!transitioning && inGame) getFirst(player2).x += 1;
-});
-
+function ConsoleKeys()
+{
+  onInput(upKeyOne, () => {
+    if (!transitioning && inGame) getFirst(player1).y -= 1;
+  });
+  
+  onInput(leftKeyOne, () => {
+    if (!transitioning && inGame) getFirst(player1).x -= 1;
+  });
+  
+  onInput(downKeyOne, () => {
+    if (!transitioning && inGame) getFirst(player1).y += 1;
+  });
+  
+  onInput(rightKeyOne, () => {
+    if (!transitioning && inGame) getFirst(player1).x += 1;
+  });
+  
+  onInput(upKeyTwo, () => {
+    if (!transitioning && inGame) getFirst(player2).y -= 1;
+  });
+  
+  onInput(leftKeyTwo, () => {
+    if (!transitioning && inGame) getFirst(player2).x -= 1;
+  });
+  
+  onInput(downKeyTwo, () => {
+    if (!transitioning && inGame) getFirst(player2).y += 1;
+  });
+  
+  onInput(rightKeyTwo, () => {
+    if (!transitioning && inGame) getFirst(player2).x += 1;
+  });
+}
 
 
 // rebinds the wasd keys for console to make 2 player easier
@@ -470,8 +582,8 @@ function rebindKeysForConsole() {
   downKeyTwo = "l"
 }
 
-afterInput(() => {
 
+afterInput(() => {
   // soccer game functionality
   if (level == 1) {
     // checks for if goal tiles and the ball tile is in one tile

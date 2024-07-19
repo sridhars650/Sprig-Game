@@ -39,6 +39,12 @@ let count = 0;
 // to freeze char if its transitioning from one lvl to another
 let transitioning = false;
 
+// menu stuffs
+let menuPCColor = 0;
+let menuConsoleColor = 0;
+let menuHelpColor = 9;
+let menuSelection = "Play on PC"
+
 setLegend(
   [ player1, bitmap`
 ................
@@ -251,14 +257,24 @@ setSolids(
 )
 
 // game level score
-let level = 1
+let level = 0
 const levels = [
   map`
-........
-........
-........
-........
-........`, // menu (still need building) ; 0
+...................
+...................
+...................
+...................
+...................
+...................
+...................
+...................
+...................
+...................
+...................
+...................
+...................
+...................
+...................`, // menu (still need building) ; 0
   map`
 l...........r
 l...........r
@@ -300,6 +316,12 @@ qqqq..q.q..q.q......o.f` // the race;4
 
 // core functionality
 setMap(levels[level])
+setPushables({
+  [ player1 ]: [ player2, soccerBall, bBall],
+  [ player2 ]: [ player1, soccerBall, bBall ],
+  [ soccerBall ]: [ player1, player2 ],
+  [ bBall ]: [ player1, player2 ]
+})
 
 // sets title of the game
 function resetGameTitle() {
@@ -309,46 +331,99 @@ function resetGameTitle() {
   else if (level == 4) {addText("The Race", {y:1,color:color`2`})}
 }
 resetGameTitle();
+function setMenu() {
+  addText("Play on PC", {
+    x:1,
+    y:1,
+    color: color`${menuPCColor}`,
+  })
+  addText("Play on Console", {
+    x:1,
+    y:3,
+    color: color`${menuConsoleColor}`
+  })
+  addText("Help", {
+    x:1,
+    y:5,
+    color: color`${menuHelpColor}`
+  })
+  addText("Left Controls:", {
+    x:1,
+    y:10,
+    color: color`0`
+  })
+  addText("to navigate menu", {
+    x:1,
+    y:11,
+    color: color`0`
+  })
+  addText("Right Down Key:", {
+    x:1,
+    y:13,
+    color: color`0`
+  })
+  addText("to select", {
+    x:1,
+    y:14,
+    color: color`0`
+  })
+}
+setMenu()
 
-setPushables({
-  [ player1 ]: [ player2, soccerBall, bBall],
-  [ player2 ]: [ player1, soccerBall, bBall ],
-  [ soccerBall ]: [ player1, player2 ],
-  [ bBall ]: [ player1, player2 ]
-})
+// THIS IS ONLY FOR MENU
+if (level == 0) {
+  onInput(upKeyOne, () => {
+    if (menuPCColor != 9) {
+      if (menuHelpColor == 9) {
+        menuHelpColor = 0
+        menuConsoleColor = 9;
+        menuSelection = "Help"
+        setMenu()
+      }
+      else if (menuConsoleColor == 9) {
+        menuConsoleColor = 0;
+        menuPCColor = 9;
+        menuSelection = "Play on Console"
+        setMenu()
+      }
+    }
+  })
+}
 
-onInput(upKeyOne, () => {
-  if (!transitioning) getFirst(player1).y -= 1
-})
-
-onInput(leftKeyOne, () => {
-  if (!transitioning) getFirst(player1).x -= 1
-})
-
-onInput(downKeyOne, () => {
-  if (!transitioning) getFirst(player1).y += 1
-})
-
-onInput(rightKeyOne, () => {
-  if (!transitioning) getFirst(player1).x += 1
-})
-
-onInput(upKeyTwo, () => {
-  if (!transitioning) getFirst(player2).y -= 1
-})
-
-onInput(leftKeyTwo, () => {
-  if (!transitioning) getFirst(player2).x -= 1
-})
-
-onInput(downKeyTwo, () => {
-  if (!transitioning) getFirst(player2).y += 1
-})
-
-onInput(rightKeyTwo, () => {
-  if (!transitioning) getFirst(player2).x += 1
-})
-
+// if statement ensures for menu only
+if (level > 0) {
+  onInput(upKeyOne, () => {
+    if (!transitioning) getFirst(player1).y -= 1
+  })
+  
+  onInput(leftKeyOne, () => {
+    if (!transitioning) getFirst(player1).x -= 1
+  })
+  
+  onInput(downKeyOne, () => {
+    if (!transitioning) getFirst(player1).y += 1
+  })
+  
+  onInput(rightKeyOne, () => {
+    if (!transitioning) getFirst(player1).x += 1
+  })
+  
+  onInput(upKeyTwo, () => {
+    if (!transitioning) getFirst(player2).y -= 1
+  })
+  
+  onInput(leftKeyTwo, () => {
+    if (!transitioning) getFirst(player2).x -= 1
+  })
+  
+  onInput(downKeyTwo, () => {
+    if (!transitioning) getFirst(player2).y += 1
+  })
+  
+  onInput(rightKeyTwo, () => {
+    if (!transitioning) getFirst(player2).x += 1
+  })
+}
 // rebinds the wasd keys for console to make 2 player easier
 function rebindKeysForConsole() {
   // player one controls on console

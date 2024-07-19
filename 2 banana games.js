@@ -865,6 +865,9 @@ let menuSelection = "Play on PC"
 let inMenu = true; // DEV TESTING SET TO TRUE WHEN DONE
 let inGame = false; // DEV TESTING SET TO FALSE WHEN DONE
 
+// help menu stuffs
+let backButtonColor = 9;
+
 setLegend(
   [ player1, bitmap`
 ................
@@ -1163,7 +1166,19 @@ qqqq..q.q..q.q......o.f`, // the race; 4
 ................
 ................
 ................`, // hot lava
-  map`.`, // help menu
+  map`
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............
+...............`, // help menu
 ]
 
 // core functionality
@@ -1261,10 +1276,76 @@ if (level == 0) {
   onInput(downKeyTwo, () => {
     if (inMenu)
     {
-      if (menuSelection === "Play on PC") {PCKeys(); setTimeout(advanceLevel, 0)}
-      else if (menuSelection === "Play on Console") {rebindKeysForConsole(); ConsoleKeys(); setTimeout(advanceLevel, 0)}
-      else if (menuSelection === "Help") {}
+      if (menuSelection === "Play on PC") {
+        PCKeys(); 
+        setTimeout(advanceLevel, 0); 
+        inMenu = false; 
+        inGame = true
+      }
+      else if (menuSelection === "Play on Console") {
+        rebindKeysForConsole(); 
+        ConsoleKeys(); 
+        setTimeout(advanceLevel, 0); 
+        inMenu = false; 
+        inGame = true}
+      else if (menuSelection === "Help") {
+        setMap(levels[6]); 
+        clearText(); 
+        helpMenuKeys()
+        inHelpMenu = true; 
+        inMenu= false;}
     }
+  })
+}
+
+function helpMenuKeys() {
+  if (inHelpMenu) {
+    addHelpMenuText()
+    onInput(downKeyTwo, () => {
+      inHelpMenu =false;
+      inMenu = true;
+      clearText();
+      setMenu();
+      setMap(levels[0])
+    })
+  }
+}
+
+function addHelpMenuText() {
+  addText("Back", {
+    x:1,
+    y:1,
+    color: color`9`
+  })
+  addText("If you need help,", {
+    x:1,
+    y:3,
+    color: color`0`
+  })
+  addText("please visit this", {
+    x:1,
+    y:5,
+    color: color`0`
+  })
+  addText("github README: ", {
+    x:1,
+    y:7,
+    color: color`0`
+  })
+  addText("https://github.com/", {
+    x:1,
+    y:10,
+    color: color`0`
+  })
+  addText("sridhars650/", {
+    x:1,
+    y:12,
+    color: color`0`
+  })
+  addText("Sprig-Game", {
+    x:1,
+    y:14,
+    color: color`0`
   })
 }
 
@@ -1477,8 +1558,6 @@ function advanceLevel() {
     clearText();
     setMap(nextLevel);
     resetGameTitle();
-    inMenu = false;
-    inGame = true;
   } else {
     clearText();
     theEnd = true;

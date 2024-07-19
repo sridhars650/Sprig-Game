@@ -868,6 +868,7 @@ let inGame = false; // DEV TESTING SET TO FALSE WHEN DONE
 // help menu stuffs
 let backButtonColor = 9;
 
+// all sprite images are contained in 128x 128 pixels
 setLegend(
   [ player1, bitmap`
 ................
@@ -885,7 +886,7 @@ setLegend(
 ......000.......
 ......0.0.......
 .....00.00......
-................` ],
+................` ], // main characters
   [ player2, bitmap`
 ................
 ................
@@ -902,7 +903,7 @@ setLegend(
 .......000......
 .......0.0......
 ......00.00.....
-................` ],
+................` ], // main characters
   [ soccerBall, bitmap`
 .....00000000...
 ..000.......00..
@@ -987,7 +988,7 @@ setLegend(
 .....00..00.....
 ......0000......
 ................
-................`],
+................`], // basketball game
   [ bBallBasketRight, bitmap`
 ................
 ................
@@ -1004,7 +1005,7 @@ setLegend(
 .....00..00.....
 ......0000......
 ................
-................`],
+................`], // basketball game
   [ bBall, bitmap`
 ...0000000000...
 ..099999099990..
@@ -1021,7 +1022,7 @@ setLegend(
 0999099099990990
 .09999909999900.
 ..099990999990..
-...0000000000...`],
+...0000000000...`], // basketball game
   [ finishLine, bitmap`
 0.0.0.0..0.0.0.0
 .0.0.0.00.0.0.0.
@@ -1038,7 +1039,7 @@ setLegend(
 0.0.0.0..0.0.0.0
 .0.0.0.00.0.0.0.
 0.0.0.0..0.0.0.0
-.0.0.0.00.0.0.0.`],
+.0.0.0.00.0.0.0.`], // the race
   [ obstacle, bitmap`
 ................
 .....0000000....
@@ -1055,7 +1056,7 @@ setLegend(
 ..0L0.....0L0...
 ..000.....000...
 ................
-................`],
+................`], // the race
   [ obstacle2, bitmap`
 ......0000......
 ......0990......
@@ -1072,7 +1073,7 @@ setLegend(
 0099999999999900
 .00099999999000.
 ...000099000....
-......0000......`],
+......0000......`], // the race
   [ lava, bitmap`
 0939339303339030
 9930339939303339
@@ -1089,9 +1090,11 @@ setLegend(
 3039330333339333
 3333333903930393
 9393033333393933
-0939333930333390`]
+0939333930333390`] // hot lava game
 )
 
+
+// sets collision true to these sprites
 setSolids(
   [player1, player2, soccerBall, bBall, obstacle, obstacle2]
 )
@@ -1102,6 +1105,7 @@ const playback = tracks.forEach((e) => playTune(e, Infinity));
 
 // game level score
 let level = 0 // DEV TESTING SET TO 0 WHEN DONE
+// level nums corresponds to map layout
 const levels = [
   map`
 ...................
@@ -1165,7 +1169,7 @@ qqqq..q.q..q.q......o.f`, // the race; 4
 ................
 ................
 ................
-................`, // hot lava
+................`, // hot lava; 5
   map`
 ...............
 ...............
@@ -1178,11 +1182,13 @@ qqqq..q.q..q.q......o.f`, // the race; 4
 ...............
 ...............
 ...............
-...............`, // help menu
+...............`, // help menu; 6
 ]
 
 // core functionality
+// sets initial map
 setMap(levels[level])
+// allows sprites to push each other
 setPushables({
   [ player1 ]: [ player2, soccerBall, bBall],
   [ player2 ]: [ player1, soccerBall, bBall ],
@@ -1198,7 +1204,10 @@ function resetGameTitle() {
   else if (level == 4) {addText("The Race", {y:1,color:color`2`})}
   else if (level == 5) {addText("Hot Lava", {y:1, color: color`2`})}
 }
+// initial
 resetGameTitle();
+
+// func adds text for main menu
 function setMenu() {
   addText("Play on PC", {
     x:1,
@@ -1239,6 +1248,7 @@ function setMenu() {
 
 
 // THIS IS ONLY FOR MENU
+// menu navigation logic 
 if (level == 0) {
   isMenu = true;
   onInput(upKeyOne, () => {
@@ -1269,6 +1279,7 @@ if (level == 0) {
         menuConsoleColor = 0;
         menuHelpColor = 9;
         menuSelection = "Help"
+        console.log("help meee")
         setMenu()
       }
     }
@@ -1287,22 +1298,26 @@ if (level == 0) {
         ConsoleKeys(); 
         setTimeout(advanceLevel, 0); 
         inMenu = false; 
-        inGame = true}
+        inGame = true
+      }
       else if (menuSelection === "Help") {
-        setMap(levels[6]); 
+        console.log("in help")
         clearText(); 
-        helpMenuKeys()
+        setMap(levels[6]); 
         inHelpMenu = true; 
-        inMenu= false;}
+        inMenu= false;
+        helpMenuKeys()
+      }
     }
   })
 }
 
+// function for help menu navigation
 function helpMenuKeys() {
   if (inHelpMenu) {
     addHelpMenuText()
     onInput(downKeyTwo, () => {
-      inHelpMenu =false;
+      inHelpMenu = false;
       inMenu = true;
       clearText();
       setMenu();
@@ -1311,6 +1326,7 @@ function helpMenuKeys() {
   }
 }
 
+// adds text to help menu
 function addHelpMenuText() {
   addText("Back", {
     x:1,
@@ -1349,10 +1365,11 @@ function addHelpMenuText() {
   })
 }
 
+// initial for menu
 setMenu() // DEV TESTING UNCOMMENT WHEN DONE
 
 //PCKeys() // DEV TESTING COMMENT WHEN DONE
-// while statement ensures for menu only
+// function for movement input for pc players
 function PCKeys()
 {
   onInput(upKeyOne, () => {
@@ -1388,6 +1405,7 @@ function PCKeys()
   });
 }
 
+// function for input for console players
 function ConsoleKeys()
 {
   onInput(upKeyOne, () => {

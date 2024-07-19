@@ -1,13 +1,11 @@
 /*
-First time? Check out the tutorial game:
-https://sprig.hackclub.com/gallery/getting_started
-
 @title: the two bananas game
 @author: sridhar
 @tags: ['#bananasarecool']
 @addedOn: 2024-00-00
 */
 
+// all sprites
 const player1 = "p"
 const player2 = "t"
 const soccerBall = "s"
@@ -17,6 +15,9 @@ const sumoBounds = "b"
 const bBallBasketLeft = "a"
 const bBallBasketRight = "c"
 const bBall = "d"
+const finishLine = "f"
+const obstacle = "o"
+const obstacle2 = "q"
 
 // for computer people; one and two stands for player one and player two
 let upKeyOne = "w"
@@ -187,15 +188,66 @@ setLegend(
 0999099099990990
 .09999909999900.
 ..099990999990..
-...0000000000...`]
+...0000000000...`],
+  [ finishLine, bitmap`
+0.0.0.0..0.0.0.0
+.0.0.0.00.0.0.0.
+0.0.0.0..0.0.0.0
+.0.0.0.00.0.0.0.
+0.0.0.0..0.0.0.0
+.0.0.0.00.0.0.0.
+0.0.0.0..0.0.0.0
+.0.0.0.00.0.0.0.
+0.0.0.0..0.0.0.0
+.0.0.0.00.0.0.0.
+0.0.0.0..0.0.0.0
+.0.0.0.00.0.0.0.
+0.0.0.0..0.0.0.0
+.0.0.0.00.0.0.0.
+0.0.0.0..0.0.0.0
+.0.0.0.00.0.0.0.`],
+  [ obstacle, bitmap`
+................
+.....0000000....
+.....0111110....
+.....0111110....
+.....0111110....
+.....0111110....
+0000000000000000
+0DDDDDDDDDDDDDD0
+0D0DDDDDDDDDDDD0
+0D0DDDDDDDDDDDD0
+0DDDDDDDDDDDDDD0
+0000000000000000
+..0L0.....0L0...
+..000.....000...
+................
+................`],
+  [ obstacle2, bitmap`
+......0000......
+......0990......
+.....009900.....
+.....029920.....
+.....092290.....
+....00999900....
+....09999990....
+....02999920....
+....09222290....
+.00009999990000.
+0099009999009900
+0999900000099990
+0099999999999900
+.00099999999000.
+...000099000....
+......0000......`]
 )
 
 setSolids(
-  [player1, player2, soccerBall, bBall]
+  [player1, player2, soccerBall, bBall, obstacle, obstacle2]
 )
 
 // game level score
-let level = 1
+let level = 4
 const levels = [
   map`
 ........
@@ -228,7 +280,18 @@ bbbbbbbbb`, // sumo
 ..c..p.d.t..c..
 ...............
 ...............
-...............` //basketball
+...............`, //basketball
+  map`
+qqqq.q.q..q..q..q..q..f
+p....q.q...o.q..o..q..f
+qq...q.q.o...q...q.q.qf
+.q.........q..q...o..qf
+.qq..o.....q....q..o.qf
+.qq..q..q..q..o.q....qf
+.q......q..q....o.qqqqf
+qq....q.o...o.o.q.q...f
+t.....q.o.....q.qqq.o.f
+qqqq..q.q..q.q......o.f` // the race
 ]
 
 // core functionality
@@ -237,8 +300,9 @@ setMap(levels[level])
 // sets title of the game
 function resetGameTitle() {
   if (level == 1) {addText("Soccer Game", {y:1, color: color`2`})}
-  else if (level == 2) {addText("Sumo Game", {y:1, color: color`0`})}
+  else if (level == 2) {addText("Sumo Game", {y:2, color: color`0`})}
   else if (level == 3) {addText("Basketball Game", {y:1, color: color`2`})}
+  else if (level == 4) {addText("The Race", {y:1,color:color`2`})}
 }
 resetGameTitle();
 
@@ -339,6 +403,19 @@ afterInput(() => {
       transitioning = true;
       setTimeout(advanceLevel, 3000);
     }
+  // the race game functionality
+    const playerOneInFinishLine = tilesWith(finishLine, player1).length;
+    const playerTwoInFinishLine = tilesWith(finishLine, player2).length;
+    if (playerOneInFinishLine == 1 && !theEnd && !transitioning) {
+      addText("player one wins!", { y: 13, color: color`5` });
+      transitioning = true;
+      setTimeout(advanceLevel, 3000);
+    }
+    else if (playerTwoInFinishLine == 1 && !theEnd && !transitioning) {
+      addText("player two wins!", { y: 13, color: color`3` });
+      transitioning = true;
+      setTimeout(advanceLevel, 3000);
+    }
 })
 
 // this function makes the game advance to the next level
@@ -353,7 +430,7 @@ function advanceLevel() {
   } else {
     clearText();
     theEnd = true;
-    addText("the end!", { y: 4, color: color`0` });
+    addText("the end!", { y: 2, color: color`H` });
     console.log(theEnd);
   }
   transitioning = false;

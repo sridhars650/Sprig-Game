@@ -18,6 +18,9 @@ const bBall = "d"
 const finishLine = "f"
 const obstacle = "o"
 const obstacle2 = "q"
+const lava = "e"
+
+// music
 let tracks = [
 tune`
 0,
@@ -859,8 +862,8 @@ let menuPCColor = 9;
 let menuConsoleColor = 0;
 let menuHelpColor = 0;
 let menuSelection = "Play on PC"
-let inMenu = true;
-let inGame = false;
+let inMenu = true; // DEV TESTING SET TO TRUE WHEN DONE
+let inGame = false; // DEV TESTING SET TO FALSE WHEN DONE
 
 setLegend(
   [ player1, bitmap`
@@ -1066,7 +1069,24 @@ setLegend(
 0099999999999900
 .00099999999000.
 ...000099000....
-......0000......`]
+......0000......`],
+  [ lava, bitmap`
+0939339303339030
+9930339939303339
+3393930333393933
+9333333993330039
+3303903330993333
+9339333993339939
+3339900330933303
+0393333933303933
+9330093303933030
+3339303333339333
+9903333903303393
+3333933339393303
+3039330333339333
+3333333903930393
+9393033333393933
+0939333930333390`]
 )
 
 setSolids(
@@ -1078,7 +1098,7 @@ const playback = tracks.forEach((e) => playTune(e, Infinity));
 
 
 // game level score
-let level = 0
+let level = 0 // DEV TESTING SET TO 0 WHEN DONE
 const levels = [
   map`
 ...................
@@ -1132,7 +1152,18 @@ qq...q.q.o...q...q.q.qf
 .q......q..q....o.qqqqf
 qq....q.o...o.o.q.q...f
 t.....q.o.....q.qqq.o.f
-qqqq..q.q..q.q......o.f` // the race;4
+qqqq..q.q..q.q......o.f`, // the race; 4
+  map`
+................
+................
+................
+................
+......p..t......
+................
+................
+................
+................`, // hot lava
+  map`.`, // help menu
 ]
 
 // core functionality
@@ -1150,6 +1181,7 @@ function resetGameTitle() {
   else if (level == 2) {addText("Sumo Game", {y:2, color: color`0`})}
   else if (level == 3) {addText("Basketball Game", {y:1, color: color`2`})}
   else if (level == 4) {addText("The Race", {y:1,color:color`2`})}
+  else if (level == 5) {addText("Hot Lava", {y:1, color: color`2`})}
 }
 resetGameTitle();
 function setMenu() {
@@ -1216,7 +1248,6 @@ if (level == 0) {
         menuPCColor = 0
         menuConsoleColor = 9
         menuSelection = "Play on Console"
-        console.log("console picked")
         setMenu()
       }
       else if (menuConsoleColor == 9) {
@@ -1237,9 +1268,9 @@ if (level == 0) {
   })
 }
 
-setMenu()
+setMenu() // DEV TESTING UNCOMMENT WHEN DONE
 
-
+//PCKeys() // DEV TESTING COMMENT WHEN DONE
 // while statement ensures for menu only
 function PCKeys()
 {
@@ -1413,6 +1444,28 @@ afterInput(() => {
       setTimeout(advanceLevel, 3000);
     }
   }
+  // hot lava game
+  if (level == 5) {
+    // hot lava random logic
+    if (!theEnd && !transitioning)
+    {
+      let x = Math.floor((Math.random() * 16));
+      let y = Math.floor((Math.random() * 9));
+      addSprite(x,y,lava)
+    }
+    const playerOneInHotZone = tilesWith(lava, player1).length;
+    const playerTwoInHotZone = tilesWith(lava, player2).length;
+    if (playerOneInHotZone == 1 && !theEnd && !transitioning) {
+      addText("player two wins!", { y: 14, color: color`3` });
+      transitioning = true;
+      setTimeout(advanceLevel, 3000);
+    }
+    else if (playerTwoInHotZone == 1 && !theEnd && !transitioning) {
+      addText("player one wins!", { y: 14, color: color`5` });
+      transitioning = true;
+      setTimeout(advanceLevel, 3000);
+    }
+  }
 })
 
 // this function makes the game advance to the next level
@@ -1420,7 +1473,7 @@ function advanceLevel() {
   level++;
   const nextLevel = levels[level]
 
-  if (nextLevel !== undefined) {
+  if (nextLevel !== undefined && level != 6) {
     clearText();
     setMap(nextLevel);
     resetGameTitle();
@@ -1429,8 +1482,7 @@ function advanceLevel() {
   } else {
     clearText();
     theEnd = true;
-    addText("the end!", { y: 2, color: color`H` });
-    console.log(theEnd);
+    addText("the end!", { y: 1, color: color`H` });
   }
   transitioning = false;
 }

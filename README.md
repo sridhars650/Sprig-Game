@@ -51,6 +51,7 @@ Console players play with device between them. They play facing each other unles
 ## Additional Information
 - The game features music tracks that play continuously during gameplay.
 - Levels transition automatically after a win, with a short delay to display the winner.
+- Levels also are randomized, so you cannot expect a certain level and be prepared for it. This calls for the banana's best reflexes!
 - If you are in the menu, use the controls to navigate and select your options.
 - This game features a score system which you can see the results at the end of the game!
 - The game starts in the main menu. Use the navigation keys to select an option and start playing.

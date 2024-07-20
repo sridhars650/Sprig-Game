@@ -872,6 +872,11 @@ let backButtonColor = 9;
 let player1Score = 0;
 let player2Score = 0;
 
+//randomization
+let usedLevels = [];
+let allLevelsUsed = false;
+
+
 // all sprite images are contained in 128x 128 pixels
 setLegend(
   [ player1, bitmap`
@@ -1112,21 +1117,10 @@ let level = 0 // DEV TESTING SET TO 0 WHEN DONE
 // level nums corresponds to map layout
 const levels = [
   map`
-...................
-...................
-...................
-...................
-...................
-...................
-...................
-...................
-...................
-...................
-...................
-...................
-...................
-...................
-...................`, // menu (still need building) ; 0
+.....
+..p.t
+.....
+.....`, // menu ; 0
   map`
 l...........r
 l...........r
@@ -1175,18 +1169,12 @@ qqqq..q.q..q.q......o.f`, // the race; 4
 ................
 ................`, // hot lava; 5
   map`
-...............
-...............
-...............
-...............
-...............
-...............
-...............
-...............
-...............
-...............
-...............
-...............`, // help menu; 6
+........
+........
+........
+........
+........
+......pt`, // help menu; 6
 ]
 
 // core functionality
@@ -1590,34 +1578,49 @@ afterInput(() => {
   }
 })
 
+
 // this function makes the game advance to the next level
 function advanceLevel() {
-  level++;
-  const nextLevel = levels[level]
-
-  if (nextLevel !== undefined && level != 6) {
-    clearText();
-    setMap(nextLevel);
-    resetGameTitle();
+  // randomization part of code
+  if (allLevelsUsed && level !== 6) {
+    level = 6;
+  } else if (allLevelsUsed) {
+    return;
   } else {
+    usedLevels.push(level);
+
+    level = Math.floor(Math.random() * 5) + 1; // 1 - 5 num random generator
+    while (usedLevels.includes(level)) { // checks if it hasnt been used before
+      level = Math.floor(Math.random() * 5) + 1; // if it has, redoes it until it doesnt
+    }
+    if (usedLevels.length === 5) { // checks if all five games are played
+      allLevelsUsed = true; 
+    }
+  }
+
+  const nextLevel = levels[level];
+  if (level === 6) {
     clearText();
     theEnd = true;
     addText("the end!", { y: 1, color: color`H` });
-    if (player1Score > player2Score)
-    {
-      addText("winner: blue banana!", {  y: 14, color: color`5` })
-      addText("final score: " + player1Score + "-" + player2Score, {  y: 15, color: color`4` })
+    // descriptions to show player
+    if (player1Score > player2Score) {
+      addText("winner: blue banana!", { y: 14, color: color`5` });
+      addText("final score: " + player1Score + "-" + player2Score, { y: 15, color: color`4` });
+    } else if (player2Score > player1Score) {
+      addText("winner: red banana!", { y: 14, color: color`3` });
+      addText("final score: " + player1Score + "-" + player2Score, { y: 15, color: color`4` });
+    } else {
+      addText("it's a draw! " + player1Score + "-" + player2Score, { y: 14, color: color`4` });
+      addText("final score: " + player1Score + "-" + player2Score, { y: 15, color: color`4` });
     }
-    else if (player2Score > player1Score)
-    {
-      addText("winner: red banana!", {  y: 14, color: color`3` })
-      addText("final score: " + player1Score + "-" + player2Score, {  y: 15, color: color`4` })
-    }
-    else 
-    {
-      addText("its a draw! " + player1Score + "-" + player2Score, { y: 14, color: color`4` })
-      addText("final score: " + player1Score + "-" + player2Score, {  y: 15, color: color`4` })
-    }
+  } else if (nextLevel !== undefined) {
+    clearText();
+    setMap(nextLevel);
+    resetGameTitle();
   }
+
   transitioning = false;
 }
+
+

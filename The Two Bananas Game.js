@@ -1242,7 +1242,7 @@ function setMenu() {
 // THIS IS ONLY FOR MENU
 // menu navigation logic 
 if (level == 0) {
-  isMenu = true;
+  inMenu = true;
   onInput(upKeyOne, () => {
     if (menuPCColor != 9 && inMenu) {
       if (menuHelpColor == 9) {
